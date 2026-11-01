@@ -1,0 +1,41 @@
+# Compiled Java files
+
+*.class
+
+# Build output
+
+out/
+build/
+target/
+
+# IDE files
+
+.idea/
+.vscode/
+*.iml
+
+# Eclipse
+
+.project
+.classpath
+.settings/
+
+# NetBeans
+
+/nbproject/private/
+/build/
+/dist/
+
+# Logs
+
+*.log
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# Temporary files
+
+*.tmp
+*~
