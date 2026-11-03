@@ -30,8 +30,9 @@ public class Doctor extends Thread {
                         Hospital.log("Doctor " + id + " finished treating P" + p.get_id());
 
                     } finally {
-                        treatmentRoom.release();
+        
                         Hospital.log("Doctor " + id + " released the treatment room.");
+                        treatmentRoom.release();
                     }
                     p.finishTreatment();
 
