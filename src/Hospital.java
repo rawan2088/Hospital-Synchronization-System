@@ -2,29 +2,28 @@ import java.util.Scanner;
 
 public class Hospital {
 
-    void create_doctors(int docs, WaitingRoom wRoom, TreatmentRooms tRoom){
-        for(int i = 0; i < docs; i++){
-            Doctor d = new Doctor(i+1, wRoom, tRoom);
-            d.start();
+    Doctor[] create_doctors(int docs, WaitingRoom wRoom, TreatmentRooms tRoom) {
+        Doctor[] doctors = new Doctor[docs];
+        for (int i = 0; i < docs; i++) {
+            doctors[i] = new Doctor(i + 1, wRoom, tRoom);
+            doctors[i].start();
         }
+        return doctors;
     }
 
-    void create_patients(int pats, WaitingRoom wRoom) throws InterruptedException {
+    Patient[] create_patients(int pats, WaitingRoom wRoom) throws InterruptedException {
         Patient[] patients = new Patient[pats];
-        for(int i = 0; i < pats; i++){
-            patients[i] = new Patient(i+1, wRoom);
+        for (int i = 0; i < pats; i++) {
+            patients[i] = new Patient(i + 1, wRoom);
             patients[i].start();
+            Thread.sleep(100); // Simulate patients arriving at different times
         }
-        for(Patient p: patients){
-            p.join();
-        }
+        return patients;
     }
 
-    static synchronized void log(String s){
+    static synchronized void log(String s) {
         System.out.println(s);
     }
-
-
 
     public static void main(String[] args) throws Exception {
 
@@ -37,7 +36,7 @@ public class Hospital {
         int pats = scanner.nextInt();
         scanner.close();
 
-        if(cap <= 0 || docs <= 0 || pats < 0){
+        if (cap <= 0 || docs <= 0 || pats < 0) {
             throw new IllegalArgumentException("Invalid Input");
         }
 
@@ -46,9 +45,24 @@ public class Hospital {
         WaitingRoom wRoom = new WaitingRoom(cap);
         TreatmentRooms tRoom = new TreatmentRooms();
 
-        hospital.create_doctors(docs, wRoom, tRoom);
-        hospital.create_patients(pats, wRoom);
+        Doctor[] doctors = hospital.create_doctors(docs, wRoom, tRoom);
+
+        Patient[] patients = hospital.create_patients(pats, wRoom);
+
+
+        for (Patient p : patients) {
+            p.join();
+        }
+
+        for (Doctor d : doctors) {
+            d.interrupt();
+        }
+
+        for (Doctor d : doctors) {
+            d.join();
+        }
+        Hospital.log("All patients have been treated.");
+        Hospital.log("Simulation completed.");
 
     }
 }
-
