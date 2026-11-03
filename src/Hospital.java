@@ -10,9 +10,13 @@ public class Hospital {
     }
 
     void create_patients(int pats, WaitingRoom wRoom) throws InterruptedException {
+        Patient[] patients = new Patient[pats];
         for(int i = 0; i < pats; i++){
-            Patient p = new Patient(i+1, wRoom);
-            p.start();
+            patients[i] = new Patient(i+1, wRoom);
+            patients[i].start();
+        }
+        for(Patient p: patients){
+            p.join();
         }
     }
 
@@ -22,7 +26,7 @@ public class Hospital {
 
 
 
-    void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter waiting room capacity: ");
@@ -32,6 +36,10 @@ public class Hospital {
         System.out.print("Enter Number of patients: ");
         int pats = scanner.nextInt();
         scanner.close();
+
+        if(cap <= 0 || docs <= 0 || pats < 0){
+            throw new IllegalArgumentException("Invalid Input");
+        }
 
         Hospital hospital = new Hospital();
 
