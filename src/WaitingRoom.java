@@ -2,7 +2,7 @@
 public class WaitingRoom {
 
     private final int capacity;
-    private Patient[] spaces;
+    private final Patient[] spaces;
 
     private int in = 0, out = 0;
 
@@ -25,7 +25,14 @@ public class WaitingRoom {
 
     void addPatient(Patient p) throws InterruptedException {
 
-        empty.acquire();
+        if (!empty.tryAcquire(0)) {
+            Hospital.log("The waiting room is full.");
+            Hospital.log("P" + p.get_id()
+                    + " is waiting outside for an available seat.");
+
+            empty.acquire();
+        }
+
         try {
             mutex.acquire();
         } catch (InterruptedException e) {
@@ -39,6 +46,8 @@ public class WaitingRoom {
         } finally {
             mutex.release();
         }
+        Hospital.log("P" + p.get_id() + " entered the waiting room.");
+
         full.release();
     }
 
