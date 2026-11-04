@@ -12,11 +12,11 @@ public class Hospital {
     }
 
     Patient[] create_patients(int pats, WaitingRoom wRoom) throws InterruptedException {
+        log("Patients arriving: ");
         Patient[] patients = new Patient[pats];
         for (int i = 0; i < pats; i++) {
             patients[i] = new Patient(i + 1, wRoom);
             patients[i].start();
-            Thread.sleep(100); // Simulate patients arriving at different times
         }
         return patients;
     }

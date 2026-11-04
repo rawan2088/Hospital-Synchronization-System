@@ -10,6 +10,8 @@ public class WaitingRoom {
     private final Semaphore full;
     private final Semaphore empty;
 
+    private final Object entryLock = new Object();
+
     WaitingRoom(int capacity) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("capacity must be greater than zero");
@@ -24,13 +26,16 @@ public class WaitingRoom {
     }
 
     void addPatient(Patient p) throws InterruptedException {
+        //synchronized block to avoid printing wRoom is full before another patient tries to print entered
+        synchronized(entryLock){
+            if (!empty.tryAcquire(0)) {
+                Hospital.log("The waiting room is full.");
+                Hospital.log("P" + p.get_id()
+                        + " is waiting outside for an available seat.");
 
-        if (!empty.tryAcquire(0)) {
-            Hospital.log("The waiting room is full.");
-            Hospital.log("P" + p.get_id()
-                    + " is waiting outside for an available seat.");
-
-            empty.acquire();
+                empty.acquire();
+            }
+            Hospital.log("P" + p.get_id() + " entered the waiting room.");
         }
 
         try {
@@ -46,12 +51,11 @@ public class WaitingRoom {
         } finally {
             mutex.release();
         }
-        Hospital.log("P" + p.get_id() + " entered the waiting room.");
 
         full.release();
     }
 
-    Patient takePatient() throws InterruptedException {
+    Patient takePatient(int doctorId) throws InterruptedException {
         full.acquire();
         try {
             mutex.acquire();
@@ -67,11 +71,17 @@ public class WaitingRoom {
             p = spaces[out];
             spaces[out] = null;
             out = (out + 1) % capacity;
+            // moved this to wRoom to avoid p2 printing "p2 entered wRoom" before doctor is assigned to p1 and is taken out of the wRoom
+            Hospital.log("Doctor " + doctorId + " is assigned to P" + p.get_id() + ".");
         } finally {
             mutex.release();
         }
 
-        empty.release();
         return p;
+    }
+
+    // moved this statement to a separate function to be called by doctor after acquiring a room
+    void releaseSeat(){
+        empty.release();
     }
 }
