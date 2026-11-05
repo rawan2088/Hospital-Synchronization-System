@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 
 public class Hospital {
@@ -24,6 +25,14 @@ public class Hospital {
     static synchronized void log(String s) {
         System.out.println(s);
     }
+    // Prints a group of messages together, followed by an empty line.
+    static synchronized void logBlock(String... messages) {
+        for (String message : messages) {
+            System.out.println(message);
+        }
+
+        System.out.println();
+    }
 
     public static void main(String[] args) throws Exception {
 
@@ -48,7 +57,6 @@ public class Hospital {
         Doctor[] doctors = hospital.create_doctors(docs, wRoom, tRoom);
 
         Patient[] patients = hospital.create_patients(pats, wRoom);
-
 
         for (Patient p : patients) {
             p.join();

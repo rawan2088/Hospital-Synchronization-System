@@ -15,40 +15,71 @@ public class Doctor extends Thread {
     }
 
     @Override
-    public void run() {
-        try {
-            while (true) {
-                Patient p = waitingRoom.takePatient(id);
-                Hospital.log("Doctor " + id + " is trying to acquire a treatment room.");
+public void run() {
 
-                // boolean treated = false;
-                if (treatmentRoom.tryAcquire(3000)) {
-                    try {
-                        Hospital.log("Doctor " + id + " acquired a treatment room.");
-                        //calling wRoom's function to release seat in waiting room after doctor acquires a room
-                        Hospital.log("Doctor " + id + " begins treating P" + p.get_id());
-                        Thread.sleep(rand.nextInt(3000) + 2000);
-                        // Thread.sleep(6000);
-                        Hospital.log("Doctor " + id + " finished treating P" + p.get_id());
-                        // waitingRoom.releaseSeat();
-                    } finally {
-                        Hospital.log("Doctor " + id + " released the treatment room.");
-                        treatmentRoom.release();
-                    }
-                    Hospital.log("Doctor " + id + " is now available.");
-                    p.finishTreatment();
-                } else {
-                    Hospital.log("Doctor " + id + " could not acquire a treatment room.");
-                    Hospital.log("Doctor " + id + " is sending P" + p.get_id() + " back to the waiting room.");
-                    waitingRoom.addPatient(p);
-                    Hospital.log("Doctor " + id + " is now available.");
-                    // waitingRoom.releaseSeat();
+    try {
+
+        while (true) {
+
+            Patient p = waitingRoom.takePatient(id);
+
+            Hospital.logBlock(
+                "Doctor " + id + " is trying to acquire a treatment room."
+            );
+
+            if (treatmentRoom.tryAcquire(3000)) {
+
+                try {
+
+                    Hospital.logBlock(
+                        "Doctor " + id + " acquired a treatment room.",
+                        "Doctor " + id + " begins treating P" + p.get_id() + "."
+                    );
+
+                    Thread.sleep(rand.nextInt(3000) + 2000);
+
+                    Hospital.log(
+                        "Doctor " + id + " finished treating P" + p.get_id() + "."
+                    );
+
+                } finally {
+
+                    treatmentRoom.release();
+
+                    Hospital.log(
+                        "Doctor " + id + " released the treatment room."
+                    );
+
                 }
-            }
 
-        } catch (InterruptedException e) {
-            // hospital intterrupted the doctor thread. 
-            Thread.currentThread().interrupt();
+                Hospital.logBlock(
+                    "Doctor " + id + " is now available."
+                );
+
+                p.finishTreatment();
+
+            } else {
+
+                Hospital.logBlock(
+                    "Doctor " + id + " could not acquire a treatment room.",
+                    "Doctor " + id + " is sending P" + p.get_id()
+                            + " back to the waiting room."
+                );
+
+                waitingRoom.addPatient(p, false);
+
+                Hospital.logBlock(
+                    "Doctor " + id + " is now available."
+                );
+            }
         }
+
+    } catch (InterruptedException e) {
+
+        Thread.currentThread().interrupt();
+
     }
+}
+
+    
 }

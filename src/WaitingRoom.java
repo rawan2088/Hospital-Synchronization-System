@@ -10,7 +10,8 @@ public class WaitingRoom {
     private final Semaphore full;
     private final Semaphore empty;
 
-    // private final Object entryLock = new Object();
+    private final Object entryLock = new Object();
+
     WaitingRoom(int capacity) {
         if (capacity <= 0) {
             throw new IllegalArgumentException("capacity must be greater than zero");
@@ -24,17 +25,23 @@ public class WaitingRoom {
         this.empty = new Semaphore(capacity);
     }
 
-    void addPatient(Patient p) throws InterruptedException {
-        //synchronized block to avoid printing wRoom is full before another patient tries to print entered
-        // synchronized(entryLock){
+    void addPatient(Patient p, boolean newArrival) throws InterruptedException {
+
+    // synchronized (entryLock) {
+
+        if (newArrival) {
+            Hospital.log("P" + p.get_id() + " arrived.");
+        }
+
         if (!empty.tryAcquire(0)) {
-            Hospital.log("The waiting room is full.");
-            Hospital.log("P" + p.get_id()
-                    + " is waiting outside for an available seat.");
+
+            Hospital.logBlock(
+                "The waiting room is full.",
+                "P" + p.get_id() + " is waiting outside for an available seat."
+            );
 
             empty.acquire();
         }
-        // }
 
         try {
             mutex.acquire();
@@ -46,13 +53,18 @@ public class WaitingRoom {
         try {
             spaces[in] = p;
             in = (in + 1) % capacity;
-            Hospital.log("P" + p.get_id() + " entered the waiting room.");
+
+            Hospital.logBlock(
+                "P" + p.get_id() + " entered the waiting room."
+            );
+
         } finally {
             mutex.release();
         }
 
         full.release();
-    }
+    // }
+}
 
     Patient takePatient(int doctorId) throws InterruptedException {
         full.acquire();
