@@ -27,7 +27,7 @@ public class WaitingRoom {
 
     void addPatient(Patient p, boolean newArrival) throws InterruptedException {
 
-    // synchronized (entryLock) {
+    synchronized (entryLock) {
 
         if (newArrival) {
             Hospital.log("P" + p.get_id() + " arrived.");
@@ -63,7 +63,7 @@ public class WaitingRoom {
         }
 
         full.release();
-    // }
+    }
 }
 
     Patient takePatient(int doctorId) throws InterruptedException {
