@@ -27,8 +27,8 @@ public class Doctor extends Thread {
                         Hospital.log("Doctor " + id + " acquired a treatment room.");
                         //calling wRoom's function to release seat in waiting room after doctor acquires a room
                         Hospital.log("Doctor " + id + " begins treating P" + p.get_id());
-                        // Thread.sleep(rand.nextInt(2000) + 2000);
-                        Thread.sleep(6000);
+                        Thread.sleep(rand.nextInt(3000) + 2000);
+                        // Thread.sleep(6000);
                         Hospital.log("Doctor " + id + " finished treating P" + p.get_id());
                         // waitingRoom.releaseSeat();
                     } finally {
